@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KakfaConfiguration {
+public class KafkaConfiguration {
 
     public ConsumerFactory<String, TelegramMessage> consumerFactory() {
         JsonDeserializer<TelegramMessage> deserializer = new JsonDeserializer<>(TelegramMessage.class);
