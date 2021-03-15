@@ -14,11 +14,11 @@ public class KafkaTestListener {
     Bot bot;
 
     @KafkaListener(topics = "org.telegram.bot.sendmessage", groupId = "group_json",
-            containerFactory = "customFactory")
+            containerFactory = "customConsumerFactory")
     public void consumeJson(TelegramMessage message) {
         SendMessage sendMessage = SendMessage.builder()
                 .chatId(message.getChatId())
-                .text("Kafka " + message.getText())
+                .text(message.getText())
                 .parseMode(message.getParseMode())
                 .disableWebPagePreview(message.isDisableWebPagePreview()).build();
         bot.sendMessage(sendMessage);

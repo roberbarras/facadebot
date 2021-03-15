@@ -2,7 +2,7 @@ server:
   port: ${PORT:8090}
 kafka:
   server: 'localhost:9092'
-  receiveMessageTopic: 'org.telegram.bot.receiveMessage'
+  receiveMessageTopic: 'org.telegram.bot.receivemessage'
   sendMessageTopic: 'org.telegram.bot.sendmessage'
 logging:
   level:
