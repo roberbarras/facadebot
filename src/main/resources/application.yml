@@ -2,8 +2,11 @@ server:
   port: ${PORT:8090}
 kafka:
   server: 'localhost:9092'
-  receiveMessageTopic: 'org.telegram.bot.receivemessage'
-  sendMessageTopic: 'org.telegram.bot.sendmessage'
+  group: 'group_one'
+  offset: 'earliest'
+  topics:
+    receivemessage: 'org.telegram.bot.receivemessage'
+    sendmessage: 'org.telegram.bot.sendmessage'
 logging:
   level:
     root: off

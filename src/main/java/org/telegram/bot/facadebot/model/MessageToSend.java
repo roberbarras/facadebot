@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class TelegramMessage implements Serializable {
+public class MessageToSend implements Serializable {
 
     private String chatId;
     private String text;
