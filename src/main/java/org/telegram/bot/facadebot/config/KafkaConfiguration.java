@@ -1,7 +1,9 @@
 package org.telegram.bot.facadebot.config;
 
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +22,23 @@ import java.util.Map;
 @Configuration
 public class KafkaConfiguration {
 
-    @Value("${kafka.server}")
-    private String server;
+    @Value("${spring.kafka.consumer.group-id}")
+    private String groupId;
 
-    @Value("${kafka.group}")
-    private String group;
+    @Value("${CLOUDKARAFKA_BROKERS}")
+    private String brokers;
 
-    @Value("${kafka.offset}")
+    @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String offset;
+
+    @Value("${spring.kafka.properties.security.protocol}")
+    private String protocol;
+
+    @Value("${spring.kafka.properties.sasl.mechanism}")
+    private String mechanism;
+
+    @Value("${spring.kafka.properties.sasl.jaas.config}")
+    private String credentials;
 
     public ConsumerFactory<String, MessageToSend> consumerFactory() {
         JsonDeserializer<MessageToSend> deserializer = new JsonDeserializer<>(MessageToSend.class);
@@ -37,12 +48,15 @@ public class KafkaConfiguration {
 
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offset);
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offset);
+        config.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
+        config.put(SaslConfigs.SASL_MECHANISM, mechanism);
+        config.put(SaslConfigs.SASL_JAAS_CONFIG, credentials);
+
 
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
     }
@@ -59,9 +73,12 @@ public class KafkaConfiguration {
     public ProducerFactory<String, MessageReceived> producerFactory() {
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
+        config.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, protocol);
+        config.put(SaslConfigs.SASL_MECHANISM, mechanism);
+        config.put(SaslConfigs.SASL_JAAS_CONFIG, credentials);
 
         return new DefaultKafkaProducerFactory<>(config);
     }

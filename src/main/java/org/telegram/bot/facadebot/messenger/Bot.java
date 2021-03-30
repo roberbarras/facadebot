@@ -1,7 +1,6 @@
 package org.telegram.bot.facadebot.messenger;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -24,15 +23,19 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String botToken;
 
-    @Autowired
-    private KafkaTemplate<String, MessageReceived> customProducerMessage;
+    @Value("${bot.admin}")
+    private long admin;
 
-    public void sendMessage(MessageToSend message) {
-        try {
-            execute(mapper(message));
-        } catch (TelegramApiException e) {
-            log.error(e.getMessage());
-        }
+    @Value("${cloudkarafka.topic.receivemessage}")
+    private String receiveMessageTopic;
+
+    @Value("${cloudkarafka.topic.receiveadminmessage}")
+    private String receiveAdminMessageTopic;
+
+    private final KafkaTemplate<String, MessageReceived> customProducerMessage;
+
+    Bot(KafkaTemplate<String, MessageReceived> kafkaTemplate) {
+        this.customProducerMessage = kafkaTemplate;
     }
 
     @Override
@@ -48,12 +51,17 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         Optional.of(update.getMessage().getChatId())
-                .filter(elem -> elem.equals(-570179047L))
-                .ifPresentOrElse((elem) -> {
-                    customProducerMessage.send("org.telegram.bot.receiveadminmessage", mapper(update));
-                }, () -> {
-                    customProducerMessage.send("org.telegram.bot.receivemessage", mapper(update));
-                });
+                .filter(elem -> elem.equals(admin))
+                .ifPresentOrElse((elem) -> customProducerMessage.send(receiveAdminMessageTopic, mapper(update)),
+                        () -> customProducerMessage.send(receiveMessageTopic, mapper(update)));
+    }
+
+    public void sendMessage(MessageToSend message) {
+        try {
+            execute(mapper(message));
+        } catch (TelegramApiException e) {
+            log.error(e.getMessage());
+        }
     }
 
     private MessageReceived mapper(Update update) {
@@ -66,11 +74,10 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private SendMessage mapper(MessageToSend message) {
-        SendMessage sendMessage = SendMessage.builder()
+        return SendMessage.builder()
                 .chatId(message.getChatId())
                 .text(message.getText())
                 .parseMode(message.getParseMode())
                 .disableWebPagePreview(message.isDisableWebPagePreview()).build();
-        return sendMessage;
     }
 }
