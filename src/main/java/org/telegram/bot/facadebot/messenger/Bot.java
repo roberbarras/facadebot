@@ -50,6 +50,7 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        log.info("Update \"{}\" received from {} ", update.getMessage().getText(), update.getMessage().getFrom().getUserName());
         Optional.of(update.getMessage().getChatId())
                 .filter(elem -> elem.equals(admin))
                 .ifPresentOrElse((elem) -> customProducerMessage.send(receiveAdminMessageTopic, mapper(update)),
@@ -57,6 +58,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void sendMessage(MessageToSend message) {
+        log.info("Message send: {}", message.getText().substring(0, 35));
         try {
             execute(mapper(message));
         } catch (TelegramApiException e) {
