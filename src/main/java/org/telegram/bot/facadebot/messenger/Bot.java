@@ -11,8 +11,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.Optional;
-
 @Slf4j
 @Component
 public class Bot extends TelegramLongPollingBot {
@@ -28,9 +26,6 @@ public class Bot extends TelegramLongPollingBot {
 
     @Value("${cloudkarafka.topic.receivemessage}")
     private String receiveMessageTopic;
-
-    @Value("${cloudkarafka.topic.receiveadminmessage}")
-    private String receiveAdminMessageTopic;
 
     private final KafkaTemplate<String, MessageReceived> customProducerMessage;
 
@@ -50,15 +45,16 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.info("Update \"{}\" received from {} ", update.getMessage().getText(), update.getMessage().getFrom().getUserName());
-        Optional.of(update.getMessage().getChatId())
-                .filter(elem -> elem.equals(admin))
-                .ifPresentOrElse((elem) -> customProducerMessage.send(receiveAdminMessageTopic, mapper(update)),
-                        () -> customProducerMessage.send(receiveMessageTopic, mapper(update)));
+        log.info("_____________________________________________________");
+        log.info("| Update recived");
+        log.info("| From: '{}'", update.getMessage().getFrom().toString());
+        log.info("| Received message: '{}'", update.getMessage().getText());
+        customProducerMessage.send(receiveMessageTopic, mapper(update));
     }
 
     public void sendMessage(MessageToSend message) {
-        log.info("Message send: {}", message.getText().substring(0, 35));
+        log.info("| Sent message: '{}'", message.getText().replace("\n", " "));
+        log.info("_____________________________________________________\n");
         try {
             execute(mapper(message));
         } catch (TelegramApiException e) {

@@ -15,7 +15,6 @@ public class KafkaTestListener {
     }
 
     @KafkaListener(topics = "${cloudkarafka.topic.sendmessage}", containerFactory = "customConsumerFactory")
-    @KafkaListener(topics = "${cloudkarafka.topic.sendadminmessage}", containerFactory = "customConsumerFactory")
     public void consumeJson(MessageToSend message) {
         bot.sendMessage(message);
     }

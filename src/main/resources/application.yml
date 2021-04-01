@@ -1,12 +1,5 @@
 server:
   port: ${PORT:8090}
-kafka:
-  server: 'localhost:9092'
-  group: 'group_one'
-  offset: 'earliest'
-  topics:
-    receivemessage: 'org.telegram.bot.receivemessage'
-    sendmessage: 'org.telegram.bot.sendmessage'
 logging:
   level:
     root: off
@@ -17,9 +10,7 @@ logging:
 cloudkarafka:
   topic:
     receivemessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.receivemessage'
-    receiveadminmessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.receiveadminmessage'
     sendmessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.sendmessage'
-    sendadminmessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.sendadminmessage'
 spring:
   kafka:
     bootstrap-servers: ${CLOUDKARAFKA_BROKERS}
