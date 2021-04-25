@@ -7,29 +7,17 @@ logging:
       telegram:
         bot:
           facadebot: debug
-cloudkarafka:
+kafka:
+  consumer: ${KAFKA_CONSUMER}
+  server: ${KAFKA_SERVER}
+  jaas: ${KAFKA_JAAS_CONFIG}
   topic:
-    receivemessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.receivemessage'
-    sendmessage: '${CLOUDKARAFKA_USERNAME}-org.telegram.bot.sendmessage'
-spring:
-  kafka:
-    bootstrap-servers: ${CLOUDKARAFKA_BROKERS}
-    consumer:
-      auto-offset-reset: latest
-      group-id: ${CLOUDKARAFKA_USERNAME}-consumers
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: sample.kafka
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    properties:
-      sasl:
-        jaas:
-          config: org.apache.kafka.common.security.scram.ScramLoginModule
-            required username="${CLOUDKARAFKA_USERNAME}" password="${CLOUDKARAFKA_PASSWORD}";
-        mechanism: SCRAM-SHA-256
-      security:
-        protocol: SASL_SSL
+    sendmessage: '${KAFKA_USERNAME}-org.telegram.bot.sendmessage'
+    receivemessage: '${KAFKA_USERNAME}-org.telegram.bot.receivemessage'
+    sizesrequest: '${KAFKA_USERNAME}-org.telegram.bot.availablesizesrequest'
+    sizesresponse: '${KAFKA_USERNAME}-org.telegram.bot.availablesizesresponse'
+    newalert: '${KAFKA_USERNAME}-org.telegram.bot.newalert'
+bot:
+  name: ${TELEGRAM_NAME}
+  token: ${TELEGRAM_TOKEN}
+  admin: ${ADMIN_CHATID}

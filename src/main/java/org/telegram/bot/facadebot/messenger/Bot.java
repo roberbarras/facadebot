@@ -24,7 +24,7 @@ public class Bot extends TelegramLongPollingBot {
     @Value("${bot.admin}")
     private long admin;
 
-    @Value("${cloudkarafka.topic.receivemessage}")
+    @Value("${kafka.topic.receivemessage}")
     private String receiveMessageTopic;
 
     private final KafkaTemplate<String, MessageReceived> customProducerMessage;
