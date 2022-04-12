@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 public class MessageReceived {
 
-    private Integer clientId;
+    private Long clientId;
     private String name;
     private String language;
     private long chatId;
